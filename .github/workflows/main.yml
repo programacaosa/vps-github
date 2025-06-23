@@ -10,6 +10,7 @@ jobs:
       run: |
         echo "Atualizando pacotes..."
         sudo apt update && sudo apt install -y openssh-server curl
+
         echo "Configurando senha root..."
         echo -e "githubvps\ngithubvps" | sudo passwd root
         echo "PermitRootLogin yes" | sudo tee -a /etc/ssh/sshd_config
@@ -27,11 +28,15 @@ jobs:
         echo "Abrindo túnel SSH..."
         nohup ngrok tcp 22 &
 
-        sleep 10
+        echo "Aguardando Ngrok iniciar..."
+        sleep 30
 
-        echo "Endereço SSH:"
-        curl -s localhost:4040/api/tunnels | grep -o 'tcp://[0-9a-zA-Z.:]*'
-        
-        echo "Senha SSH: githubvps"
+        echo "Capturando endereço SSH..."
+        LINK=$(curl -s localhost:4040/api/tunnels | grep -o 'tcp://[0-9a-zA-Z.:]*')
+
+        echo "======================================="
+        echo "Endereço SSH: $LINK"
         echo "Usuário: root"
+        echo "Senha: githubvps"
         echo "Duração máxima: 6 horas"
+        echo "======================================="
